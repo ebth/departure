@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Departure
   class Configuration
     attr_accessor :tmp_path, :global_percona_args
 
     def initialize
-      @tmp_path = '.'.freeze
-      @error_log_filename = 'departure_error.log'.freeze
+      @tmp_path = '.'
+      @error_log_filename = 'departure_error.log'
       @global_percona_args = nil
     end
 

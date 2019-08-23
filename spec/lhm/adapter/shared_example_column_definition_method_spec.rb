@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # TODO: What about ENUM?
 shared_examples 'column-definition method' do |method_name|
   let(:migration) { double(:migration) }

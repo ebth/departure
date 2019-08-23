@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'lhm/column_with_sql'
 require 'lhm/column_with_type'
 
@@ -77,7 +79,7 @@ module Lhm
     # @param index_name [String]
     def add_unique_index(columns, index_name = nil)
       options = { unique: true }
-      options.merge!(name: index_name) if index_name # rubocop:disable Performance/RedundantMerge
+      options.merge!(name: index_name) if index_name
 
       migration.add_index(table_name, columns, options)
     end

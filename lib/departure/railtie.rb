@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'departure'
 require 'lhm' # It's our own Lhm adapter, not the gem
 require 'rails'

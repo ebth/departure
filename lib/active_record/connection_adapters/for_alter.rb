@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'active_record/connection_adapters/mysql/schema_statements'
 
 module ForAlterStatements
   class << self
     def included(_)
-      STDERR.puts 'Including for_alter statements'
+      warn 'Including for_alter statements'
     end
   end
 
@@ -15,6 +17,7 @@ module ForAlterStatements
       method = :"#{command}_for_alter"
 
       raise "Unknown method called : #{method}(#{arguments.inspect})" unless respond_to?(method, true)
+
       public_send(method, table, *arguments)
     end.join(', ')
 

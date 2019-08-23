@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Departure
   class NullLogger
     def say(_message, _subitem = false)

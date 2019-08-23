@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Departure
   module LogSanitizers
     class PasswordSanitizer
-      PASSWORD_REPLACEMENT = '[filtered_password]'.freeze
+      PASSWORD_REPLACEMENT = '[filtered_password]'
 
       delegate :password_argument, to: :connection_details
 
@@ -11,6 +13,7 @@ module Departure
 
       def execute(log_statement)
         return log_statement if password_argument.blank?
+
         log_statement.gsub(password_argument, PASSWORD_REPLACEMENT)
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Departure
   # Encapsulates the pt-online-schema-change options defined by the user
   class UserOptions

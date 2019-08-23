@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DataMigrationWithFindEach < ActiveRecord::Migration[5.1]
   class Comment < ActiveRecord::Base; end
 

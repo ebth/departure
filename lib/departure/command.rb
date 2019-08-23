@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Departure
   # Executes the given command returning it's status and errors
   class Command
@@ -41,17 +43,15 @@ module Departure
     # execution status
     def run_in_process
       Open3.popen3(full_command) do |_stdin, stdout, _stderr, waith_thr|
-        begin
-          loop do
-            IO.select([stdout])
-            data = stdout.read_nonblock(8192)
-            logger.write_no_newline(data)
-          end
-        rescue EOFError # rubocop:disable Lint/HandleExceptions
-          # noop
-        ensure
-          @status = waith_thr.value
+        loop do
+          IO.select([stdout])
+          data = stdout.read_nonblock(8192)
+          logger.write_no_newline(data)
         end
+      rescue EOFError # rubocop:disable Lint/HandleExceptions
+        # noop
+      ensure
+        @status = waith_thr.value
       end
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'open3'
 
 module Departure
@@ -45,6 +47,10 @@ module Departure
     # @return [Boolean]
     def execute(command_line)
       Command.new(command_line, error_log_path, logger).run
+    end
+
+    def prepare(sql)
+      mysql_adapter.raw_connection.prepare(sql)
     end
 
     private

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DdlStatementOnComments < ActiveRecord::Migration[5.1]
   def up
     Lhm.change_table :comments, { stride: 5000, throttle: 150 } do |c|

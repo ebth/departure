@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'lhm/adapter/shared_example_column_definition_method_spec'
 

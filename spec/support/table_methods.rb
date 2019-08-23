@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TableMethods
   def columns(table_name)
     ActiveRecord::Base.connection.columns(table_name)

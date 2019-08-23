@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Departure
   class Error < StandardError; end
 
@@ -5,7 +7,7 @@ module Departure
   # status.
   class NoStatusError < Error
     def message
-      'Status could not be retrieved'.freeze
+      'Status could not be retrieved'
     end
   end
 

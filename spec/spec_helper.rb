@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'bundler'
 require 'simplecov'
 SimpleCov.start
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 Bundler.require(:default, :development)
 
@@ -31,7 +33,7 @@ ActiveRecord::Base.establish_connection(
   database: db_config['database']
 )
 
-MIGRATION_FIXTURES = File.expand_path('../fixtures/migrate/', __FILE__)
+MIGRATION_FIXTURES = File.expand_path('fixtures/migrate', __dir__)
 
 test_database = TestDatabase.new(db_config)
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 
 module Lhm
@@ -90,7 +92,7 @@ module Lhm
       match = /((\w*) NULL)/i.match(definition)
       return true unless match
 
-      match[2].downcase == 'not' ? false : true
+      match[2].downcase != 'not'
     end
   end
 end

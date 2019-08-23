@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'lhm/adapter'
 
 # Defines the same global namespace as LHM's gem does to mimic its API

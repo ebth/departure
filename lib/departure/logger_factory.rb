@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Departure
   module LoggerFactory
     # Returns the appropriate logger instance for the given configuration. Use

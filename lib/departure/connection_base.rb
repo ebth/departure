@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Departure
   class ConnectionBase < ActiveRecord::Base
     def self.establish_connection(config = nil)

@@ -1,4 +1,8 @@
 ---
+AllCops:
+  TargetRubyVersion: 2.5
+  CacheRootDirectory: ./tmp/cache
+
 Metrics/AbcSize:
   Enabled: false
 
@@ -7,6 +11,7 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/*'
     - 'spec/**/*'
+    - lib/active_record/connection_adapters/percona_adapter.rb
 
 Metrics/BlockNesting:
   Max: 4
@@ -29,9 +34,14 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   Max: 5
 
-Performance/Casecmp:
-  Enabled: false
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - lib/active_record/connection_adapters/percona_adapter.rb
 
+Metrics/PerceivedComplexity:
+  Exclude:
+    - lib/active_record/connection_adapters/percona_adapter.rb
+    -
 Style/BracesAroundHashParameters:
   Exclude:
     - 'spec/fixtures/migrate/**.rb'
@@ -57,4 +67,7 @@ Style/SymbolArray:
 Style/UnneededPercentQ:
   Exclude:
     - 'departure.gemspec'
+
+Naming/AccessorMethodName:
+  Enabled: false
 

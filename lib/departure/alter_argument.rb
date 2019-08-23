@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Departure
   class InvalidAlterStatement < StandardError; end
 
   # Represents the '--alter' argument of Percona's pt-online-schema-change
   # See https://www.percona.com/doc/percona-toolkit/2.0/pt-online-schema-change.html
   class AlterArgument
-    ALTER_TABLE_REGEX = /\AALTER TABLE `(\w+)` /
+    ALTER_TABLE_REGEX = /\AALTER TABLE `(\w+)` /.freeze
 
     attr_reader :table_name
 

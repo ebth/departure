@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Departure
   class Option
     attr_reader :name, :value

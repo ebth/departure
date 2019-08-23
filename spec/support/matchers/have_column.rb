@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Defines a matcher to check whether a table contains a given column.
 #
 # @example Check the comments table contains the id column:

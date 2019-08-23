@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NonLhmMigration < ActiveRecord::Migration[5.1]
   def up
     Lhm.change_table :products, { stride: 5000, throttle: 150 } do |p|

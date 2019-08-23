@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Departure, integration: true do
   class Comment < ActiveRecord::Base; end
 
   let(:migration_fixtures) do
-    File.expand_path('../fixtures/lhm_migrate/', __FILE__)
+    File.expand_path('fixtures/lhm_migrate', __dir__)
   end
   let(:direction) { :up }
 
