@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record/connection_adapters/abstract_mysql_adapter'
 require 'active_record/connection_adapters/statement_pool'
 require 'active_record/connection_adapters/mysql2_adapter'
@@ -60,11 +62,9 @@ module ActiveRecord
 
       extend Forwardable
 
-      unless method_defined?(:change_column_for_alter)
-        include ForAlterStatements
-      end
+      include ForAlterStatements unless method_defined?(:change_column_for_alter)
 
-      ADAPTER_NAME = 'Percona'.freeze
+      ADAPTER_NAME = 'Percona'
 
       def_delegators :mysql_adapter, :last_inserted_id, :each_hash, :set_field_encoding
 
@@ -74,19 +74,35 @@ module ActiveRecord
         @prepared_statements = false
       end
 
-      def exec_delete(sql, name, binds)
-        execute(to_sql(sql, binds), name)
-        @connection.affected_rows
+      def exec_delete(sql, name, binds = [])
+        if without_prepared_statement?(binds)
+          @lock.synchronize do
+            execute_and_free(sql, name) { @connection.affected_rows }
+          end
+        else
+          exec_stmt_and_free(sql, name, binds, &:affected_rows)
+        end
       end
       alias exec_update exec_delete
 
-      def exec_insert(sql, name, binds, pk = nil, sequence_name = nil) # rubocop:disable Lint/UnusedMethodArgument, Metrics/LineLength
-        execute(to_sql(sql, binds), name)
-      end
-
-      def exec_query(sql, name = 'SQL', _binds = [])
-        result = execute(sql, name)
-        ActiveRecord::Result.new(result.fields, result.to_a)
+      def exec_query(sql, name = 'SQL', binds = [], prepare: false)
+        if without_prepared_statement?(binds)
+          execute_and_free(sql, name) do |result|
+            if result
+              ActiveRecord::Result.new(result.fields, result.to_a)
+            else
+              ActiveRecord::Result.new([], [])
+            end
+          end
+        else
+          exec_stmt_and_free(sql, name, binds, cache_stmt: prepare) do |_, result|
+            if result
+              ActiveRecord::Result.new(result.fields, result.to_a)
+            else
+              ActiveRecord::Result.new([], [])
+            end
+          end
+        end
       end
 
       # Executes a SELECT query and returns an array of rows. Each row is an
@@ -146,8 +162,48 @@ module ActiveRecord
       # AbstractMysqlAdapter requires it to be implemented
       def error_number(_exception); end
 
-      def full_version
+      def get_full_version
         mysql_adapter.raw_connection.server_info[:version]
+      end
+
+      def full_version
+        schema_cache.database_version.full_version_string
+      end
+
+      def exec_stmt_and_free(sql, name, binds, cache_stmt: false)
+        if preventing_writes? && write_query?(sql)
+          raise ActiveRecord::ReadOnlyError, "Write query attempted while in readonly mode: #{sql}"
+        end
+
+        materialize_transactions
+
+        type_casted_binds = type_casted_binds(binds)
+
+        log(sql, name, binds, type_casted_binds) do
+          stmt = if cache_stmt
+                   @statements[sql] ||= @connection.prepare(sql)
+                 else
+                   @connection.prepare(sql)
+                 end
+
+          begin
+            result = ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+              stmt.execute(*type_casted_binds)
+            end
+          rescue Mysql2::Error => e
+            if cache_stmt
+              @statements.delete(sql)
+            else
+              stmt.close
+            end
+            raise e
+          end
+
+          ret = yield stmt, result
+          result&.free
+          stmt.close unless cache_stmt
+          ret
+        end
       end
 
       private
