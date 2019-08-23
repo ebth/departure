@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ActiveRecord::ConnectionAdapters::DepartureAdapter do
@@ -20,7 +22,7 @@ describe ActiveRecord::ConnectionAdapters::DepartureAdapter do
     let(:collation) { double(:collation) }
 
     let(:column) do
-      described_class.new(field, default, mysql_metadata, type, null, collation)
+      described_class.new(field, default, mysql_metadata, type, null, collation: collation)
     end
 
     describe '#adapter' do
@@ -143,7 +145,6 @@ describe ActiveRecord::ConnectionAdapters::DepartureAdapter do
   describe '#exec_delete' do
     let(:sql) { 'DELETE FROM comments WHERE id = 1' }
     let(:name) { nil }
-    let(:binds) { nil }
 
     before do
       allow(runner).to receive(:query).with(sql)
@@ -152,29 +153,27 @@ describe ActiveRecord::ConnectionAdapters::DepartureAdapter do
 
     it 'executes the sql' do
       expect(adapter).to(receive(:execute).with(sql, name))
-      adapter.exec_delete(sql, name, binds)
+      adapter.exec_delete(sql, name)
     end
 
     it 'returns the number of affected rows' do
-      expect(adapter.exec_delete(sql, name, binds)).to eq(1)
+      expect(adapter.exec_delete(sql, name)).to eq(1)
     end
   end
 
   describe '#exec_insert' do
     let(:sql) { 'INSERT INTO comments (id) VALUES (20)' }
     let(:name) { nil }
-    let(:binds) { nil }
 
     it 'executes the sql' do
       expect(adapter).to(receive(:execute).with(sql, name))
-      adapter.exec_insert(sql, name, binds)
+      adapter.exec_insert(sql, name)
     end
   end
 
   describe '#exec_query' do
     let(:sql) { 'SELECT * FROM comments' }
     let(:name) { nil }
-    let(:binds) { nil }
     let(:result_set) { double(fields: [:id], to_a: [1]) }
 
     before do
@@ -189,14 +188,14 @@ describe ActiveRecord::ConnectionAdapters::DepartureAdapter do
         receive(:execute).with(sql, name)
       ).and_return(result_set)
 
-      adapter.exec_query(sql, name, binds)
+      adapter.exec_query(sql, name)
     end
 
     it 'returns an ActiveRecord::Result' do
       expect(ActiveRecord::Result).to(
         receive(:new).with(result_set.fields, result_set.to_a)
       )
-      adapter.exec_query(sql, name, binds)
+      adapter.exec_query(sql, name)
     end
   end
 

@@ -1,10 +1,15 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Departure, integration: true do
-  class Comment < ActiveRecord::Base; end
+  class Comment < ActiveRecord::Base
+  end
+
+  let(:schema_migration) { ActiveRecord::Base.connection.schema_migration }
 
   let(:migration_fixtures) do
-    ActiveRecord::MigrationContext.new([MIGRATION_FIXTURES]).migrations
+    ActiveRecord::MigrationContext.new([MIGRATION_FIXTURES], schema_migration).migrations
   end
 
   let(:migration_paths) { [MIGRATION_FIXTURES] }
@@ -22,6 +27,7 @@ describe Departure, integration: true do
         ActiveRecord::Migrator.new(
           direction,
           migration_fixtures,
+          schema_migration,
           1
         ).migrate
       end
@@ -30,6 +36,7 @@ describe Departure, integration: true do
         ActiveRecord::Migrator.new(
           direction,
           migration_fixtures,
+          schema_migration,
           version
         ).migrate
 
@@ -40,6 +47,7 @@ describe Departure, integration: true do
         ActiveRecord::Migrator.new(
           direction,
           migration_fixtures,
+          schema_migration,
           version
         ).migrate
 
@@ -54,12 +62,14 @@ describe Departure, integration: true do
         ActiveRecord::Migrator.new(
           :up,
           migration_fixtures,
+          schema_migration,
           1
         ).migrate
 
         ActiveRecord::Migrator.new(
           :up,
           migration_fixtures,
+          schema_migration,
           version
         ).migrate
       end
@@ -68,6 +78,7 @@ describe Departure, integration: true do
         ActiveRecord::Migrator.new(
           direction,
           migration_fixtures,
+          schema_migration,
           version - 1
         ).migrate
 
@@ -78,6 +89,7 @@ describe Departure, integration: true do
         ActiveRecord::Migrator.new(
           direction,
           migration_fixtures,
+          schema_migration,
           version - 1
         ).migrate
 
@@ -90,16 +102,16 @@ describe Departure, integration: true do
       let(:version) { 13 }
 
       before do
-        ActiveRecord::Migrator.new(:up, migration_fixtures, 2).migrate
+        ActiveRecord::Migrator.new(:up, migration_fixtures, schema_migration, 2).migrate
       end
 
       it 'executes the percona command' do
-        ActiveRecord::MigrationContext.new(migration_paths).run(direction, version)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(direction, version)
         expect(:comments).to have_index('new_index_comments_on_some_id_field')
       end
 
       it 'marks the migration as down' do
-        ActiveRecord::MigrationContext.new(migration_paths).run(direction, version)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(direction, version)
         expect(ActiveRecord::Migrator.current_version).to eq(version)
       end
     end
@@ -112,18 +124,18 @@ describe Departure, integration: true do
       let(:direction) { :up }
 
       before do
-        ActiveRecord::Migrator.new(:up, migration_fixtures, 1).migrate
+        ActiveRecord::Migrator.new(:up, migration_fixtures, schema_migration, 1).migrate
       end
 
       it 'executes the percona command' do
-        ActiveRecord::MigrationContext.new(migration_paths).run(direction, version)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(direction, version)
 
         expect(unique_indexes_from(:comments))
-          .to match_array(['index_comments_on_some_id_field'])
+            .to match_array(['index_comments_on_some_id_field'])
       end
 
       it 'marks the migration as up' do
-        ActiveRecord::MigrationContext.new(migration_paths).run(direction, version)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(direction, version)
         expect(ActiveRecord::Migrator.current_version).to eq(version)
       end
     end
@@ -132,19 +144,19 @@ describe Departure, integration: true do
       let(:direction) { :down }
 
       before do
-        ActiveRecord::MigrationContext.new(migration_paths).run(:up, 1)
-        ActiveRecord::MigrationContext.new(migration_paths).run(:up, version)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(:up, 1)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(:up, version)
       end
 
       it 'executes the percona command' do
-        ActiveRecord::MigrationContext.new(migration_paths).run(direction, version)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(direction, version)
 
         expect(unique_indexes_from(:comments))
-          .not_to match_array(['index_comments_on_some_id_field'])
+            .not_to match_array(['index_comments_on_some_id_field'])
       end
 
       it 'marks the migration as down' do
-        ActiveRecord::MigrationContext.new(migration_paths).run(direction, version)
+        ActiveRecord::MigrationContext.new(migration_paths, schema_migration).run(direction, version)
         expect(ActiveRecord::Migrator.current_version).to eq(1)
       end
     end

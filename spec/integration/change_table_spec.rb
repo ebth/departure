@@ -1,10 +1,14 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Departure, integration: true do
   class Comment < ActiveRecord::Base; end
 
+  let(:schema_migration) { ActiveRecord::Base.connection.schema_migration }
+
   let(:migration_fixtures) do
-    ActiveRecord::MigrationContext.new([MIGRATION_FIXTURES]).migrations.select do |m|
+    ActiveRecord::MigrationContext.new([MIGRATION_FIXTURES], schema_migration).migrations.select do |m|
       m.version == version
     end
   end
@@ -19,7 +23,7 @@ describe Departure, integration: true do
 
     context 'creating column' do
       before(:each) do
-        ActiveRecord::Migrator.new(direction, migration_fixtures, version).migrate
+        ActiveRecord::Migrator.new(direction, migration_fixtures, schema_migration, version).migrate
       end
 
       it 'adds the column in the DB table' do
