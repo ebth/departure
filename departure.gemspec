@@ -1,6 +1,6 @@
-# coding: utf-8
+# frozen_string_literal: true
 
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'departure/version'
@@ -19,13 +19,13 @@ Gem::Specification.new do |spec|
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'railties', '~> 5.2.0'
-  spec.add_runtime_dependency 'activerecord', '~> 5.2.0'
+  spec.add_runtime_dependency 'activerecord', '~> 6.0.0'
   spec.add_runtime_dependency 'mysql2', '>= 0.4.0', '<= 0.5.2'
+  spec.add_runtime_dependency 'railties', '~> 6.0.0'
 
+  spec.add_development_dependency 'byebug', '~> 8.2', '>= 8.2.1'
+  spec.add_development_dependency 'climate_control', '~> 0.0.3'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.4', '>= 3.4.0'
   spec.add_development_dependency 'rspec-its', '~> 1.2'
-  spec.add_development_dependency 'byebug', '~> 8.2', '>= 8.2.1'
-  spec.add_development_dependency 'climate_control', '~> 0.0.3'
 end
